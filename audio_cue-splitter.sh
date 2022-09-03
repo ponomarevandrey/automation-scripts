@@ -48,7 +48,7 @@ split_flac () {
 }
 
 convert_to_flac () {
-  echo -e "\n*** Convert APE to FLAC ***"
+  echo -e "\n*** Convert source audio to FLAC ***"
 
   # `shnsplit` can convert APE to FLAC directly, but that requires us to 
   # install extra package - APE codec 
