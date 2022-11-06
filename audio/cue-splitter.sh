@@ -23,7 +23,7 @@ set -eu
 
 
 check_dependencies () {
-  dependencies=( "ffmpeg" "iconv" "shnsplit" "flac" "cuetag")
+  dependencies=( "ffmpeg" "iconv" "shnsplit" "flac" "cuetag" )
 
   for i in "${dependencies[@]}"; do
     if ! command -v $i &> /dev/null; then 
