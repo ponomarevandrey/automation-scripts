@@ -15,18 +15,18 @@ async function isPasswordMatch(password, hash) {
   }
 }
 
-console.log(`Input: ${input}`);
+console.log(`Original input value: ${input}`);
 
 hashPassword(input)
   .then(hash => {
-    console.log(`Hashed input: ${hash}`);
+    console.log(`Hashed input value: ${hash}`);
     return hash;
   })
   .then(hash => {
     return isPasswordMatch(input, hash);
   })
   .then(isMatched => {
-    console.log(`Input matches generated hash: `, isMatched);
+    console.log(`Test. Input matches generated hash: `, isMatched);
    })
   .catch(console.error);
 
