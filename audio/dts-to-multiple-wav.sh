@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -euo pipefail
+
 # This script works only wuth DTS 5.1
 
 DTS_FILE_NAME="$1"
