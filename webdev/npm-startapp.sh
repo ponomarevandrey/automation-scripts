@@ -1,14 +1,14 @@
 #!/bin/bash
 
-set -eu
+set -euo pipefail
 
-echo -ne "\n##\n##\tRUNNING WITH ENVIRONMENT=\"${NODE_ENV}\"\n##\n\n"
+echo -e "\n##\n##\tRUNNING WITH ENVIRONMENT=\"${NODE_ENV}\"\n##\n\n"
 
 #
 #
 # 
 
-echo "Start app..."
+echo -e "Start app...\n"
 
 if [ "${NODE_ENV}" == "test" ]
 then
