@@ -18,6 +18,7 @@
 #     - example: ./script ./mission_impossible/sub/sub_en.srt
 #
 
+set -euo pipefail
 
 PATH_TO_SUBTITLES="$1"
 
