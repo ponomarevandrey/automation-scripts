@@ -8,8 +8,7 @@
 #     - close all snaps before running this
 #
 
-set -eu
-# For cron job debugging
+set -euo pipefail
 printenv
 set -x
 
@@ -23,3 +22,5 @@ LANG=C snap list --all | awk '/disabled/{print $1, $3}' |
   
   
 set +x
+
+echo "Done. Old snaps removed."
