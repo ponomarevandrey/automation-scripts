@@ -15,12 +15,7 @@
 #     - concerning the subject of quality loss while ecoding/decoding
 #       https://superuser.com/questions/447338/understanding-conversion-and-decompression-of-lossless-audio
 
-# exit on error 
-# * https://stackoverflow.com/questions/2870992/automatic-exit-from-bash-shell-script-on-error
-# * https://unix.stackexchange.com/questions/544993/what-does-set-u-do-in-bash-script)
-set -eu
-
-
+set -euo pipefail
 
 check_dependencies () {
   dependencies=( "ffmpeg" "iconv" "shnsplit" "flac" "cuetag" )
