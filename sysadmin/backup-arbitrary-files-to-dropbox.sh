@@ -19,7 +19,8 @@
 #       You can get a new Dropbox access token here: https://www.dropbox.com/developers/apps/info/9lxu6ofw4bivuw2#settings
 #
 
-set -eu 
+set -euo pipefail
+
 DROPBOX_URL="https://content.dropboxapi.com/2/files/upload"
 archive_dir="backup-arbitrary-files-$(date -I)"
 
