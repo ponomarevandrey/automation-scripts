@@ -6,7 +6,7 @@
 # NOTES
 #     Run this script in directory containing .wv files
 
-set -eu
+set -euo pipefail
 
 check_dependencies () {
   dependencies=( "ffmpeg" "flac")
