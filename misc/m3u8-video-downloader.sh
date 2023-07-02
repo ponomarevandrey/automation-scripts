@@ -22,5 +22,5 @@ if \
 then \
   echo -e "\nDone. Video successfully saved to '$OUTPUT_FILE'"
 else 
-  echo "Error. Something went wrong"
+  echo -e "Error. Something went wrong\n"
 fi

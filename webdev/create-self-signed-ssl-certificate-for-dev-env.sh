@@ -8,7 +8,7 @@
 #       <server name> <output path>
 #     - example: ./script test.com ./nginx/certs
 
-set -eu
+set -euo pipefail
 
 URL="$1"
 OUTPUT_PATH="$2"
@@ -28,6 +28,6 @@ openssl req \
   -sha256 \
   -days 3650
 
-echo "Done. Created two files: "
+echo -e "\nDone. Created two files: "
 ls -F "$OUTPUT_PATH"
 
