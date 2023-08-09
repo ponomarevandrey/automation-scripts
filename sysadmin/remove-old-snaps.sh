@@ -9,8 +9,6 @@
 #
 
 set -euo pipefail
-printenv
-set -x
 
 
 
@@ -21,6 +19,4 @@ LANG=C snap list --all | awk '/disabled/{print $1, $3}' |
   
   
   
-set +x
-
-echo "Done. Old snaps removed."
+printf "\nDone. Old snaps removed.\n"
