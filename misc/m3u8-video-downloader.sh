@@ -8,7 +8,7 @@
 #       <input file name> <output file name>
 #     - example: ./script "https://website.com/video.m3u8[optional params]" "Output file name.mp4"
 
-set -euo pipefail
+-set -euo pipefail
 
 INPUT_FILE="$1"
 OUTPUT_FILE="$2"
@@ -20,7 +20,7 @@ if \
     -bsf:a aac_adtstoasc \
     "$OUTPUT_FILE"; \
 then \
-  echo -e "\nDone. Video successfully saved to '$OUTPUT_FILE'"
+  printf "\nDone. Video successfully saved to %s\n" "$OUTPUT_FILE"
 else 
-  echo -e "Error. Something went wrong\n"
+  printf "\nError. Something went wrong\n"
 fi
