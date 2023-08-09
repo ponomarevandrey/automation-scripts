@@ -10,15 +10,7 @@
 -set -euo pipefail
 -printenv
 
-set -x
-
-
-
 dpkg -l | \
 grep '^rc' | \
 awk '{print $2}' | \
 sudo xargs dpkg --purge
-
-
-
-set +x
