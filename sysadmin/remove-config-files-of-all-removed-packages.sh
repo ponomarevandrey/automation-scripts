@@ -7,8 +7,9 @@
 
 # If this script runs as a cron job and doesn't find anything to purge, it will return an error and cron job will fail. To prevent this we supress error output by sending it to /dev/null
 
-set -euo pipefail
-printenv
+-set -euo pipefail
+-printenv
+
 set -x
 
 
