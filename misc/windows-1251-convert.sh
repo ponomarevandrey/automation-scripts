@@ -6,4 +6,7 @@
 # SYNTAX 
 #   ./script Readme1.txt > Readme2.txt
 
-iconv -f windows-1251 -t UTF-8 $1 > $2 
+iconv \
+  -f windows-1251 \
+  -t UTF-8 \
+  "$1" > "$2" 
