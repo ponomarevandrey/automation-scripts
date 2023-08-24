@@ -21,7 +21,8 @@ check_dependencies () {
   dependencies=( "ffmpeg" "iconv" "shnsplit" "flac" "cuetag" )
 
   for i in "${dependencies[@]}"; do
-    if ! command -v $i &> /dev/null; then 
+    if ! command -v "$i" &> /dev/null
+    then 
       echo "${i} required" && exit 1
     fi
   done
@@ -57,7 +58,7 @@ convert_to_flac () {
     -i "$AUDIO_BASENAME" "$AUDIO_NAME.wav"
 
   echo -e "\n- Convert WAV to FLAC"
-  flac *.wav
+  flac ./*.wav
 
   echo -e "\n- Delete intermediate WAV file"
   rm --verbose "$AUDIO_NAME.wav"
@@ -78,7 +79,7 @@ process_audio () {
       echo -e "\nUnsupported audio format :(" && exit 1
   esac
 
-  read -p $'\nDo you want to delete _source_ file? [Yy/Nn] '
+  read -rp $'\nDo you want to delete _source_ file? [Yy/Nn] '
   if [[ $REPLY =~ ^[Yy]$ ]]; then
     rm --verbose "$AUDIO_BASENAME"
   fi
