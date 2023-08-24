@@ -1,4 +1,5 @@
 **/node_modules
+package-lock.json
 *_WIP
 *_WIP.sh
 /vps
