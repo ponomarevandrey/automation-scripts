@@ -1,0 +1,207 @@
+#!/bin/bash
+
+# Split audio file using cue sheet
+
+set -eu -o pipefail
+
+function show_tip {
+  printf 'Use "-h" for help.\n'
+}
+
+function check_dependencies {
+  local -r dependencies=( \
+    'ffmpeg' 'iconv' 'shnsplit' 'flac' 'wavpack' 'cuetag' \
+  )
+
+  for dependency in "${dependencies[@]}"; do
+    if ! command -v "${dependency}" &> /dev/null; then
+      printf \
+        '\n%s required.\nInstall: sudo apt install %s\n\n' \
+        "$dependency" "$dependency" \
+        1>&2
+      exit 1
+    fi
+  done
+}
+
+function parse_args {
+  function show_help {
+    cat << EOF
+NAME
+    $(basename "$0") - split audio file using CUE sheet
+
+SYNOPSIS
+    $(basename "$0") [ options... ] [ 'file.[flac|wv|ape]' 'file.cue' ]
+
+    Example:
+    $(basename "$0") './Orb - Live 93.flac' './Orb - Live 93.cue'
+
+DESCRIPTION
+    Split FLAC, APE, WV or WAV using CUE sheet into multiple FLAC files. The script also copies ID3v2 metadata from CUE sheet to each FLAC file.
+
+OPTIONS
+    -h, --help
+        Show help
+
+    -c, --cyrillic
+        Change .cue file encoding to UTF-8. Fixes the issue with cyrillic .cue files created in Windows and opened in Linux. Use this option when the script throws shntool error.
+
+EOF
+  }
+
+  # Process script options
+
+  while getopts ':-:hc' opt; do
+    case "$opt" in
+      c ) is_cue_cyrillic_lang=1 ;;
+      h ) show_help ; exit 0 ;;
+      # Support long options ---------------------------------------------------
+      - )
+          case "$OPTARG" in
+            cyrillic ) is_cue_cyrillic_lang=1 ;;
+            help     ) show_help ; exit 0 ;;
+            * )
+                       printf 'Error: Unknown long option %s\n\n' "$OPTARG" 1>&2
+                       show_tip
+                       exit 1
+                       ;;
+          esac
+          ;;
+      # --------------------------------------------------------------------------
+      : )
+        printf 'Error: No arguments supplied.\n\n' 1>&2
+        show_tip
+        exit 1
+        ;;
+      * )
+        printf 'Error: Unknown option %s.\n\n' "$OPTARG" >&2
+        show_tip
+        exit 1
+        ;;
+    esac
+  done
+  # At this point $1 = '-c'. We shift _this_function's_ params index,
+  # making $1 = './file.flac'. Don't forget, we've invoked this function
+  # forwardeding it the array of args passed to the scipt. So here, we shift
+  # the _function's internal params index, it doesn't change the global
+  # _script's_ params index, we wil do it outside the function.
+  shift $(( OPTIND - 1 ))
+
+  # Validate script args
+
+  if (( $# != 2 )); then
+    printf 'Error: Incorrect number of arguments.\n\n' 1>&2
+    show_tip
+    exit 1
+  fi
+
+  if [[ ! -f "$1" || ! "$1" =~ ^.*\.(flac|wv|ape|wav)$  ]]; then
+    printf \
+      'Error: File doesn'\''t exist or audio format is not supported.\n\n' 1>&2
+      show_tip
+    exit 1
+  fi
+
+  if [[ ! -f "$2" || ! "$2" =~ ^.*\.cue ]]; then
+    printf 'Error: File doesn'\''t exist or not a cue file.\n\n' 1>&2
+    show_tip
+    exit 1
+  fi
+}
+
+function split_audio {
+  printf '*** Split audio file\n\n'
+  echo "-----------${AUDIO_FILE_PATH%*.*}.$AUDIO_FILE_EXTENSION"
+  # Issue 'shntool -f' to list all supported audio formats
+  # '%' removes file extension from full file path
+  shnsplit \
+    -f "$CUE_FILE_PATH" \
+    -o flac \
+    -d "$ROOT_DIR" \
+    -t '%n. %p - %t' \
+    "${AUDIO_FILE_PATH}"
+}
+
+function fix_cyrillic_cue_encoding {
+  printf 'Fix cyrillic .cue encoding: convert to UTF-8.\n\n'
+
+  iconv \
+    --to-code utf-8 \
+    "$CUE_FILE_PATH" \
+    --output="${CUE_FILE_PATH}_cyr"
+  # If iconv converted successfully (0), backup the original cue file and
+  # replace old cue file with the new one
+  if (( $? == 0 )); then
+    mv "$CUE_FILE_PATH" "${CUE_FILE_PATH}_original"
+    mv "${CUE_FILE_PATH}_cyr" "$CUE_FILE_PATH"
+  fi
+}
+
+function delete_source {
+  read -r -n 1 -p \
+    "Do you want to delete the source file $AUDIO_FILE_BASENAME? [Yy/Nn] "
+  if [[ $REPLY =~ ^[Yy]$ ]]; then
+    printf '\n'
+    rm --verbose "$AUDIO_FILE_PATH"
+  fi
+}
+
+function clean_up {
+  rm --verbose "$ROOT_DIR/"[[:digit:]]*.flac
+}
+
+function process_files {
+  if [[ "$is_cue_cyrillic_lang" == 1 ]]; then
+    fix_cyrillic_cue_encoding
+  fi
+  if grep --quiet 'INDEX 01 00:00:00' "$CUE_FILE_PATH"; then
+    split_audio
+  else
+    # TODO move all printfs to function and redirect to STDERR
+    printf 'The first track has a pre-gap. Shnsplit will cut that off and put it in a separate file.\nYou don'\''t want that. Please modify the cuesheet from:\n' 1>&2
+    grep -m1 'INDEX 00' "$CUE_FILE_PATH"
+    grep -m1 'INDEX 01' "$CUE_FILE_PATH"
+    printf '\nto: INDEX 01 00:00:00\n'
+    exit 1
+  fi
+  printf \
+    '\n*** Copy ID3v2 tags to each audio file from CUE sheet %s\n\n' \
+    "$(basename "$CUE_FILE_PATH")"
+  cuetag "$CUE_FILE_PATH" "$ROOT_DIR/"[[:digit:]]*.flac
+}
+
+################################################################################
+# Vars set based on provided options
+
+is_cue_cyrillic_lang=0
+
+################################################################################
+
+parse_args "${@}"
+# shift _script_ params index making $1 = './file,flac'
+shift $(( OPTIND - 1 ))
+
+# Set relative paths based on file location instead of current working dir
+readonly SCRIPT_ABSOLUTE_PATH="${BASH_SOURCE[0]}"
+cd "$( cd "$(dirname "$SCRIPT_ABSOLUTE_PATH")"; pwd --physical )"
+
+readonly AUDIO_FILE_PATH="$1"
+readonly CUE_FILE_PATH="$2"
+AUDIO_FILE_BASENAME="$(basename "${AUDIO_FILE_PATH}")"
+readonly AUDIO_FILE_BASENAME
+readonly AUDIO_FILE_EXTENSION="${AUDIO_FILE_BASENAME##*.}" # Get extension
+
+
+# Maybe set the root dir instead of specfting paths? ROOT_DIR=
+readonly ROOT_DIR='.'
+
+
+
+
+trap clean_up INT # Call on Ctrl+C
+
+clear
+check_dependencies
+process_files
+delete_source
+printf '\nDone.\n'
