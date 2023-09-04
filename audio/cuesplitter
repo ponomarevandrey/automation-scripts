@@ -4,8 +4,6 @@
 
 set -eu -o pipefail
 
-set -x
-
 function show_tip {
   printf 'Use "-h" for help.\n'
 }
@@ -145,13 +143,18 @@ function split_audio {
 
   # As there is no APE codec for Linux, let's convert it to flac first
   if [[ "$AUDIO_FILE_PATH" == *.ape ]]; then
-    ffmpeg -i "$AUDIO_FILE_PATH" "${AUDIO_FILE_PATH%.*}.flac"
+    ffmpeg \
+      -hide_banner \
+      -i "$AUDIO_FILE_PATH" \
+      "${AUDIO_FILE_PATH%.*}.flac"
+
     shnsplit \
       -f "$CUE_FILE_PATH" \
       -o flac \
       -d "$ROOT_DIR" \
       -t '%n. %p - %t' \
-      "${AUDIO_FILE_PATH%.*}.flac" 
+      "${AUDIO_FILE_PATH%.*}.flac" \
+    && rm "${AUDIO_FILE_PATH%.*}.flac"
   else 
     shnsplit \
       -f "$CUE_FILE_PATH" \
@@ -163,7 +166,7 @@ function split_audio {
 }
 
 function fix_cyrillic_cue_encoding {
-  printf 'Fix cyrillic .cue encoding: convert to UTF-8.\n\n'
+  printf '*** Fix cyrillic .cue encoding: convert to UTF-8\n\n'
   # cp1251 refers to "Windows-1251, Cyrillic"
   iconv \
     --from-code=cp1251 \
@@ -185,6 +188,8 @@ function clean_up {
     \( -type f -name "[[:digit:]]*.flac" \) -and \
     \( -type f -not -name "$(basename "${AUDIO_FILE_PATH}")" \) \
     -delete
+  cat *_original > "$CUE_FILE_PATH"
+  rm *_original
   printf '\n'
 }
 
