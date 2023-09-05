@@ -1,0 +1,11 @@
+#!/bin/bash
+
+# Run with 'sudo'.
+
+printf '\n*** Uninstall Nginx ***\n'
+
+printf 'Remove everything including config files in "/etc/nginx".\n'
+sudo apt purge nginx nginx-common
+
+printf 'Remove dependencies used by nginx which are no longer required.\n'
+sudo apt autoremove
