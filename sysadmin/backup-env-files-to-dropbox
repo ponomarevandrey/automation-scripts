@@ -20,13 +20,13 @@
 #       You can get a new Dropbox access token here: https://www.dropbox.com/developers/apps/info/9lxu6ofw4bivuw2#settings
 #
 
-set -euo pipefail
+set -eu -o pipefail
 
-DROPBOX_URL="https://content.dropboxapi.com/2/files/upload"
+DROPBOX_URL='https://content.dropboxapi.com/2/files/upload'
 archive_dir="backup-env-files-$(date -I)"
 
 if [[ -z "${DROPBOX_ACCESS_TOKEN}" ]]; then
-  echo "The environment variable DROPBOX_ACCESS_TOKEN is not set"
+  printf 'The environment variable DROPBOX_ACCESS_TOKEN is not set\n'
   exit 1
 fi
 
@@ -46,7 +46,7 @@ done
 
 tar --create \
     --gzip  \
-    --file $archive_dir.tar.gz ./$archive_dir \
+    --file "$archive_dir".tar.gz ./"$archive_dir" \
     --remove-files
 
 
@@ -57,19 +57,18 @@ tar --create \
 
 curl --request POST \
      --url "$DROPBOX_URL" \
-     --header "Authorization: Bearer "${DROPBOX_ACCESS_TOKEN}"" \
+     --header "Authorization: Bearer ${DROPBOX_ACCESS_TOKEN}" \
      --header "Dropbox-API-Arg: {\"path\": \"/$archive_dir.tar.gz\",\"mode\": \"add\",\"autorename\": true,\"mute\": false,\"strict_conflict\": false}" \
      --header "Content-Type: application/octet-stream" \
-     --data-binary @$archive_dir.tar.gz
+     --data-binary @"$archive_dir".tar.gz
 
 
 
 #
 # Cleanup
 #
-rm ./$archive_dir.tar.gz 
+rm ./"$archive_dir".tar.gz 
 
 
 
-echo
-echo "Done"
+printf '\nDone\n'
