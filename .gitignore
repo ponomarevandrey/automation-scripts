@@ -3,5 +3,6 @@ package-lock.json
 *_WIP
 *_WIP.sh
 *_PRIVATE*
+**/backup-vps
 
 !vps/simplecloud.ru/renew-simplecloud-certs
