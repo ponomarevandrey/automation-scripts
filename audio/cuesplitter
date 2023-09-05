@@ -5,7 +5,7 @@
 set -eu -o pipefail
 
 function show_tip {
-  printf 'Use "-h" for help.\n'
+  printf 'Use "-h" for help\n'
 }
 
 function check_dependencies {
@@ -31,20 +31,20 @@ NAME
     $(basename "$0") - split audio file using CUE sheet
 
 SYNOPSIS
-    $(basename "$0") [ options... ] [ 'file.[flac|wv|ape]' 'file.cue' ]
+    $(basename "$0") [ options... ] [ ./dir/containing/files' ]
 
     Example:
-    $(basename "$0") './Orb - Live 93.flac' './Orb - Live 93.cue'
+    $(basename "$0") './Orb - Live 93'
 
 DESCRIPTION
-    Splits FLAC, APE, WV or WAV using CUE sheet into multiple FLAC files and copies ID3v2 metadata from CUE sheet to each file.
+    Splits FLAC, APE, WV or WAV using cue sheet into multiple FLAC files and copies ID3v2 metadata from cue sheet to each file
 
 OPTIONS
     -h, --help
         Show help
 
     -c, --cyrillic
-        Change .cue file encoding to UTF-8. Fixes the issue with cyrillic .cue files created in Windows and opened in Linux. Use this option when the script throws shntool error.
+        Change cue sheet encoding to UTF-8. Fixes the issue with cyrillic .cue files created in Windows and opened in Linux. Use this option when the script throws shntool error
 
 EOF
   }
@@ -69,12 +69,12 @@ EOF
           ;;
       ##########################################################################
       : )
-        printf 'Error: No arguments supplied.\n\n' 1>&2
+        printf 'Error: No arguments supplied\n\n' 1>&2
         show_tip
         exit 1
         ;;
       * )
-        printf 'Error: Unknown option %s.\n\n' "$OPTARG" >&2
+        printf 'Error: Unknown option %s\n\n' "$OPTARG" >&2
         show_tip
         exit 1
         ;;
@@ -90,13 +90,13 @@ EOF
   # Validate script args
 
   if (( $# > 1 )); then
-    printf 'Error: Incorrect number of arguments.\n\n' 1>&2
+    printf 'Error: Incorrect number of arguments\n\n' 1>&2
     show_tip
     exit 1
   fi
 
   if [[ ! -d "$1" ]]; then
-    printf 'Error: Directory doesn'\''t exist.\n\n' 1>&2
+    printf 'Error: Directory doesn'\''t exist\n\n' 1>&2
     show_tip
     exit 1
   fi
@@ -106,22 +106,22 @@ EOF
   cue_files_count="$(find "$1" -type f -regex '.*\.cue' | wc -l)"
   readonly cue_files_count
   if (( cue_files_count > 1 )); then
-    printf '%u cuesheets found in the current dir. There should be only one cue sheet. Remove the extraneous cuesheets.\n\n' "$cue_files_count" 1>&2
+    printf '%u cue sheets found in the current dir. There should be only one cue sheet. Remove the extraneous cuesheets\n\n' "$cue_files_count" 1>&2
     exit 1
   fi
   if (( cue_files_count == 0 )); then
-    printf 'No cue sheets found in the current dir.\n\n' 1>&2
+    printf 'No cue sheets found in the current dir\n\n' 1>&2
     exit 1
   fi
   if ! grep -iR --silent '\.ape\|\.flac\|\.wav\|\.wv' "$1"/*.cue ; then
     printf \
-      'Error: Audio format is not supported. Only FLAC, APE, WV and WAV files allowed.\n\n' 1>&2
+      'Error: Audio format is not supported. Only FLAC, APE, WV and WAV files allowed\n\n' 1>&2
       show_tip
     exit 1
   fi
   if ! grep --silent 'INDEX 01 00:00:00' "$1"/*.cue; then
     # TODO move all printfs to function and redirect to STDERR
-    printf 'The first track has a pre-gap. Shnsplit will cut that off and put it in a separate file.\nYou don'\''t want that. Please modify the cue sheet from:\n' 1>&2
+    printf 'The first track has a pre-gap. Shnsplit will cut that off and put it in a separate file.\nYou don'\''t want that. Please modify the cue sheet from\n' 1>&2
     grep -m1 'INDEX 00' "$1"/*.cue
     grep -m1 'INDEX 01' "$1"/*.cue
     printf '\nto: INDEX 01 00:00:00\n'
@@ -133,7 +133,7 @@ EOF
   audio_files_count="$(find "$1" -type f -regex '.*\.\(wav\|wv\|flac\|ape\)$' | wc -l)"
   readonly cue_files_count
   if (( audio_files_count > 1 )); then
-    printf '%u audio files found in the current dir. There should be only one audio file, otherwise you might loose data during script execution. Remove the extraneous audio files.\n\n' "$audio_files_count" 1>&2
+    printf '%u audio files found in the current dir. There should be only one audio file, otherwise you might loose data during script execution. Remove the extraneous audio files\n\n' "$audio_files_count" 1>&2
     exit 1
   fi
 }
@@ -181,6 +181,11 @@ function fix_cyrillic_cue_encoding {
   fi
 }
 
+function copy_id3v2 {
+  printf '\n*** Copy ID3v2 tags from cue sheet to FLAC files\n\n'
+  cuetag "$CUE_FILE_PATH" "$ROOT_DIR/"[[:digit:]]*.flac
+}
+
 function clean_up {
   # Delete all splitted audio files (.flac) except the original one
   find \
@@ -188,8 +193,8 @@ function clean_up {
     \( -type f -name "[[:digit:]]*.flac" \) -and \
     \( -type f -not -name "$(basename "${AUDIO_FILE_PATH}")" \) \
     -delete
-  cat *_original > "$CUE_FILE_PATH"
-  rm *_original
+  cat ./*_original > "$CUE_FILE_PATH"
+  rm ./*_original
   printf '\n'
 }
 
@@ -229,14 +234,10 @@ trap clean_up INT # Call on Ctrl+C
 ################################################################################
 # Main
 
-if [[ "$is_cue_cyrillic_lang" == 1 ]]; then 
-  fix_cyrillic_cue_encoding; 
-fi
+if [[ "$is_cue_cyrillic_lang" == 1 ]]; then fix_cyrillic_cue_encoding; fi
 
 split_audio
-printf '\n*** Copy ID3v2 tags from CUE sheet\n\n' 
-cuetag "$CUE_FILE_PATH" "$ROOT_DIR/"[[:digit:]]*.flac
-
+copy_id3v2
 delete_source
 
-printf '\nDone.\n'
+printf '\nDone\n'
