@@ -1,0 +1,20 @@
+#!/bin/bash
+
+# DESCRIPTION
+#     Backup and compress Postgres database running in Docker container
+#
+# SYNTAX
+#     ./script <docker db container ID>  <dir to dump to>
+
+# WARNING! The script is not finished and not tested.
+
+set -eu -o pipefail
+
+DUMP_TO_DIR="${2:-$HOME}"
+DB_NAME='db'
+
+docker exec "$(docker ps -aqf "name=$DB_NAME")" \
+  pg_dumpall \
+    --clean \
+    --username=streamer \
+  > "${DUMP_TO_DIR}/postgres-dump_$(date +'%Y_%m_%d').sql"
