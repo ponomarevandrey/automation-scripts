@@ -1,0 +1,77 @@
+#!/bin/bash
+
+# 
+# DESCRIPTION
+#      Run this script when you create a new VPS. It creates a new user, 
+#      enables SSH for him, allows new user to execute commands as "root" and
+#      disables password and SSH login for "root". 
+#      After running this script you'll be able to SSH into VPS ONLY with 
+#      "ssh new_username@VPS_IP"
+#
+# SYNTAX
+#     <NEW USER NAME> <NEW USER PASWORD>
+#
+#     - example: ./script "ikar" "123456" (always use quotation marks!)
+#
+# BEFORE RUNNING THIS SCRIPT
+#
+#     1. If on attempt to SSH into server you get "WARNING: REMOTE HOST 
+#        IDENTIFICATION HAS CHANGED!", delete hashed hosts with 
+#        "ssh-keygen -R xxx.xxx.x.xx"
+#
+#     2. Make sure that you have generated your SSH keys and they are in 
+#        "~/.ssh" directory (default location)
+#
+#     3. Copy public SSH key to your VPS to enable SSH for "root" with 
+#        "ssh-copy-id root@xxx.xxx.x.xx"
+#
+# HOW TO USE
+#
+#     Always run this script with root permissions (i.e. log in as "root"
+#     or use "sudo" before the script name)
+#
+#     1. Copy this script to VPS: 
+#        rsync \
+#          --progress \
+#          --verbose \
+#          --archive \
+#          --rsh=ssh \
+#        ./script "root@xxx.xxx.x.x:/"
+#
+#     3. Execute the scrip
+#
+
+set -eu -o pipefail
+
+USERNAME="$1"
+PASSWORD="$2"
+
+printf '1. Add new user.\n'
+useradd \
+  --create-home \
+  --shell /bin/bash \
+  "$USERNAME"
+
+printf '2. Set new user password.\n'
+printf '%s:%s' "$USERNAME" "$PASSWORD" | chpasswd
+
+printf '3. Allow new user to execute commands as "root" i.e. to use "sudo".\n'
+usermod \
+  --append \
+  --groups sudo "$USERNAME"
+
+printf '4. Move root ".ssh" to new user.\n'
+mv \
+  /root/.ssh \
+  /home/"$USERNAME"/
+
+printf '5. Change the ownership of the ".ssh" dir from "root" to new user so OpenSSH can read it.\n'
+chown \
+  --recursive \
+  "$USERNAME":"$USERNAME" /home/"$USERNAME"/.ssh
+   
+printf '6. Disable the "root" account login (both via password ans via SSH).\n'
+passwd \
+  --delete \
+  --lock \
+  root
