@@ -8,15 +8,11 @@
 #     - close all snaps before running this
 #
 
-set -euo pipefail
-
-
+set -eu -o pipefail
 
 LANG=C snap list --all | awk '/disabled/{print $1, $3}' |
   while read snapname revision; do
     snap remove "$snapname" --revision="$revision"
   done
   
-  
-  
-printf "\nDone. Old snaps removed.\n"
+printf '\nDone. Old snaps removed.\n'
