@@ -5,12 +5,12 @@
 curl \
   --include \
   --no-buffer \
-  --header "connection: upgrade" \
-  --header "upgrade: websocket" \
-  --header "host: localhost" \
-  --header "origin: http://localhost:8080" \
-  --header "sec-websocket-key: dGhlIHNhbXBsZSBub25jZQ==" \
-  --header "sec-websocket-version: 13" \
+  --header 'connection: upgrade' \
+  --header 'upgrade: websocket' \
+  --header 'host: localhost' \
+  --header 'origin: http://localhost:8080' \
+  --header 'sec-websocket-key: dGhlIHNhbXBsZSBub25jZQ==' \
+  --header 'sec-websocket-version: 13' \
   http://localhost:8080
 
-echo
+printf '\n'
