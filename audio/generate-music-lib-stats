@@ -1,0 +1,66 @@
+#!/bin/bash
+
+set -eu -o pipefail
+
+################################################################################
+# Init
+
+# LIB_PATH="/mnt/CE64EB6A64EB53AD/music-lib/tracks"
+LIB_PATH="/mnt/CE64EB6A64EB53AD/music-lib/tracks"
+DATE="$(date +"%F")"
+
+EXTENSION="${1:-flac}" # mp3, wav, ...
+
+################################################################################
+# Main
+
+printf 'Scanning %s...\n\n' "$LIB_PATH"
+
+FLAC_FILES_TOTAL="$(find "$LIB_PATH" -name '*.flac' | wc -l)"
+MP3_FILES_TOTAL="$(find  "$LIB_PATH" -name '*.mp3'  | wc -l)"
+WAV_FILES_TOTAL="$(find  "$LIB_PATH" -name '*.wav'  | wc -l)"
+APE_FILES_TOTAL="$(find  "$LIB_PATH" -name '*.ape'  | wc -l)" 
+AIFF_FILES_TOTAL="$(find "$LIB_PATH" -name '*.aiff' | wc -l)" 
+MP4_FILES_TOTAL="$(find  "$LIB_PATH" -name '*.mp4'  | wc -l)" 
+OGG_FILES_TOTAL="$(find  "$LIB_PATH" -name '*.ogg'  | wc -l)" 
+    
+TRACKS_TOTAL="$(find "$LIB_PATH" \
+  -name '*.flac' -o \
+  -name '*.mp3' -o \
+  -name '*.wav' -o \
+  -name '*.ape' -o \
+  -name '*.aiff' -o \
+  -name '*.mp4' -o \
+  -name '*.ogg' \
+  | sed 's/.\///' \
+  | wc -l)"
+  
+clear
+
+if [[ \
+      "$EXTENSION" == 'mp3' \
+      || "$EXTENSION" == 'wav' \
+      || "$EXTENSION" == 'ape' \
+      || "$EXTENSION" == 'aiff' \
+      || "$EXTENSION" == 'mp4' \
+      || "$EXTENSION" == 'ogg' \
+   ]]; then
+  find $LIB_PATH -name "*.$EXTENSION" | while read -r track; do 
+    printf '%s\n' "$(basename "$track")"
+  done
+fi
+
+cat << _EOF_
+Music Library Stats ($DATE)
+
+FLAC ......................... $(printf '%s\n' "$FLAC_FILES_TOTAL")
+MP3 .......................... $(printf '%s\n' "$MP3_FILES_TOTAL")
+WAV .......................... $(printf '%s\n' "$WAV_FILES_TOTAL")
+APE .......................... $(printf '%s\n' "$APE_FILES_TOTAL")
+AIFF ......................... $(printf '%s\n' "$AIFF_FILES_TOTAL")
+MP4 .......................... $(printf '%s\n' "$MP4_FILES_TOTAL")
+OGG .......................... $(printf '%s\n' "$OGG_FILES_TOTAL")
+
+TOTAL ........................ $TRACKS_TOTAL
+
+_EOF_
