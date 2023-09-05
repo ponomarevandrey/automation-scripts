@@ -1,0 +1,36 @@
+#!/bin/bash
+
+set -eu -o pipefail
+#set -x
+
+printf 'Ubuntu Server Cleanup\n'
+
+# Verify if we are root user
+if [[ ! "$(whoami)" == 'root' ]]; then
+	printf 'Sorry, only the root user can execute the script.\n'
+	exit 1
+fi
+
+source remove-old-snaps
+# TODO for some reason this script causes the script to exit
+# source remove-config-files-of-all-removed-packages
+
+printf '\- Removing old logs...\n'
+sudo du --summarize --human-readable /var/log/
+sudo rm --force /var/log/*.gz
+sudo rm --recursive --force /var/log/journal/*
+
+printf '\- Cleaning journal logs (removing older than 2 days) ...\n'
+sudo journalctl --disk-usage
+sudo journalctl --vacuum-time=2d 
+
+printf '\- Removing APT cache ...\n'
+sudo du -c --summarize --human-readable --total /var/cache/apt
+sudo apt clean
+
+printf '\- Removing old kernels ...\n'
+sudo apt autoremove --purge
+
+printf '\nDone\n'
+
+# TODO remove old docker images. containers, volumes. networks
