@@ -1,0 +1,44 @@
+#!/bin/bash
+
+# DESCRIPTION
+#     Convert multiple .wv files into .flac files
+#
+# NOTES
+#     Run this script in directory containing .wv files
+
+set -eu -o pipefail
+
+function check_dependencies {
+  for dependency in 'ffmpeg' 'flac'; do
+    if ! command -v "$dependency" &> /dev/null; then
+      printf \
+        '\n%s required.\nInstall: sudo apt install %s\n\n' \
+        "$dependency" "$dependency" \
+        1>&2
+      exit 1
+    fi
+  done
+}
+
+function convert_wv_to_flac {
+  for wv_file in "$1"/*.wv; do 
+    flac_file="$(printf '%s' "$wv_file" | sed s/.wv/.flac/)"
+    ffmpeg \
+      -hide_banner \
+      -loglevel error \
+      -i \
+      "$wv_file" \
+      "$flac_file"
+  done
+
+  read -r -n 1 -p 'Do you want to delete _source_ .wv files? [Yy/Nn] '
+  if [[ $REPLY =~ ^[Yy]$ ]]; then
+    printf '\n'
+    rm --verbose ./*.wv
+  fi 
+  
+  printf '\nDone\n'
+}
+
+check_dependencies
+wv_to_flac
