@@ -18,11 +18,11 @@
 #     - example: ./script ./mission_impossible/sub/sub_en.srt
 #
 
-set -euo pipefail
+set -eu -o pipefail
 
 PATH_TO_SUBTITLES="$1"
 
 grep \
-  --extended-regexp "\w+" \
-  "$PATH_TO_SUBTITLES" | tr -cs "a-zA-Z" "\n" | sort | uniq -c | sort -n > words.txt
+  --extended-regexp '\w+' \
+  "$PATH_TO_SUBTITLES" | tr -cs 'a-zA-Z' '\n' | sort | uniq -c | sort -n > words.txt
 
