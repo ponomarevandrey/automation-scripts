@@ -51,16 +51,16 @@ if [[ \
 fi
 
 cat << _EOF_
-Music Library Stats ($DATE)
+Music Library Stats $DATE
 
-FLAC ......................... $(printf '%s\n' "$FLAC_FILES_TOTAL")
-MP3 .......................... $(printf '%s\n' "$MP3_FILES_TOTAL")
-WAV .......................... $(printf '%s\n' "$WAV_FILES_TOTAL")
-APE .......................... $(printf '%s\n' "$APE_FILES_TOTAL")
-AIFF ......................... $(printf '%s\n' "$AIFF_FILES_TOTAL")
-MP4 .......................... $(printf '%s\n' "$MP4_FILES_TOTAL")
-OGG .......................... $(printf '%s\n' "$OGG_FILES_TOTAL")
+FLAC ... $(printf '%s\n' "$FLAC_FILES_TOTAL")
+MP3 .... $(printf '%s\n' "$MP3_FILES_TOTAL")
+WAV .... $(printf '%s\n' "$WAV_FILES_TOTAL")
+APE .... $(printf '%s\n' "$APE_FILES_TOTAL")
+AIFF ... $(printf '%s\n' "$AIFF_FILES_TOTAL")
+MP4 .... $(printf '%s\n' "$MP4_FILES_TOTAL")
+OGG .... $(printf '%s\n' "$OGG_FILES_TOTAL")
 
-TOTAL ........................ $TRACKS_TOTAL
+TOTAL ...$TRACKS_TOTAL
 
 _EOF_
