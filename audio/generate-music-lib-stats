@@ -16,13 +16,13 @@ EXTENSION="${1:-flac}" # mp3, wav, ...
 
 printf 'Scanning %s...\n\n' "$LIB_PATH"
 
-FLAC_FILES_TOTAL="$(find "$LIB_PATH" -name '*.flac' | wc -l)"
-MP3_FILES_TOTAL="$(find  "$LIB_PATH" -name '*.mp3'  | wc -l)"
-WAV_FILES_TOTAL="$(find  "$LIB_PATH" -name '*.wav'  | wc -l)"
-APE_FILES_TOTAL="$(find  "$LIB_PATH" -name '*.ape'  | wc -l)" 
-AIFF_FILES_TOTAL="$(find "$LIB_PATH" -name '*.aiff' | wc -l)" 
-MP4_FILES_TOTAL="$(find  "$LIB_PATH" -name '*.mp4'  | wc -l)" 
-OGG_FILES_TOTAL="$(find  "$LIB_PATH" -name '*.ogg'  | wc -l)" 
+FLAC_FILES_TOTAL="$(find "$LIB_PATH" -iname '*.flac' | wc -l)"
+MP3_FILES_TOTAL="$(find  "$LIB_PATH" -iname '*.mp3'  | wc -l)"
+WAV_FILES_TOTAL="$(find  "$LIB_PATH" -iname '*.wav'  | wc -l)"
+APE_FILES_TOTAL="$(find  "$LIB_PATH" -iname '*.ape'  | wc -l)" 
+AIFF_FILES_TOTAL="$(find "$LIB_PATH" -iname '*.aiff' | wc -l)" 
+MP4_FILES_TOTAL="$(find  "$LIB_PATH" -iname '*.mp4'  | wc -l)" 
+OGG_FILES_TOTAL="$(find  "$LIB_PATH" -iname '*.ogg'  | wc -l)" 
     
 TRACKS_TOTAL="$(find "$LIB_PATH" \
   -name '*.flac' -o \
