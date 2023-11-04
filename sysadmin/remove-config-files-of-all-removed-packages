@@ -12,9 +12,9 @@ set -eu -o pipefail
 
 printf 'Removing config files of all removed packages...\n'
 
-dpkg -l \
-  | grep '^rc' \
-  | awk '{print $2}' \
-  | sudo xargs --no-run-if-empty dpkg --purge
+dpkg -l | \
+  grep '^rc' | \
+  awk '{print $2}' | \
+  sudo xargs --no-run-if-empty dpkg --purge
 
 printf '\nDone\n'
