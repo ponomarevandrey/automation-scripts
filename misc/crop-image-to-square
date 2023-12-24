@@ -1,0 +1,6 @@
+#!/bin/bash
+
+FILE_NAME="$1"
+
+D="$(convert "$1" -format "%[fx:w<h?w:h]" info:)"
+convert "$1" -gravity center -extent "${D}x${D}" "$1+" 
