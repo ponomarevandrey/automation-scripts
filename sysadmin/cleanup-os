@@ -22,7 +22,13 @@ sudo rm --recursive --force /var/log/journal/*
 
 printf '\- Cleaning journal logs (removing older than 2 days) ...\n'
 sudo journalctl --disk-usage
-sudo journalctl --vacuum-time=2d 
+# Rotate journal files to be able to remove active journal files below,
+# with --vacuum*= command:
+sudo journalctl --rotate
+# Make all journal files contain no data older than 2days:
+sudo journalctl --vacuum-time=2d
+# Remove mail server logs
+sudo > /var/log/mail.log
 
 printf '\- Removing APT cache ...\n'
 sudo du -c --summarize --human-readable --total /var/cache/apt
