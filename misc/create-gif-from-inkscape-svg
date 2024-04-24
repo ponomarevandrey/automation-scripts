@@ -2,12 +2,14 @@
 
 set -eu -o pipefail
 
-FILE_PATH="$(basename "$1")"
-FILE_NAME="${FILE_PATH%.*}"
+FILE_PATH="$1"
+FILE_NAME="$(basename "$1")"
+NAME="${FILE_NAME%.*}"
+DIR_NAME="$(dirname "$FILE_PATH")"
 
 inkscape \
   --export-type=png \
-  --export-page=1-27 \
+  --export-page=1-24 \
   --export-background-opacity=0 \
   --export-width=800 \
   "$FILE_PATH"
@@ -16,9 +18,9 @@ inkscape \
 convert \
   -delay 10 \
   -loop 0 \
-  "${FILE_NAME}_p"{1..27}.png "${FILE_NAME}.gif"
+  "${DIR_NAME}/${NAME}_p"{1..24}.png "${DIR_NAME}/${NAME}.gif"
 
-rm ./*.png
+rm "${DIR_NAME}"/*.png
 
 printf 'Done.\n'
-ls --size --human-readable "${FILE_NAME}.gif"
+ls --size --human-readable "${DIR_NAME}/${NAME}.gif"
